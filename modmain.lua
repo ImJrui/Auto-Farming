@@ -12,9 +12,8 @@ AddPlayerPostInit(function(inst)
 end)
 
 local function Toggle()
-    local player = ThePlayer
-    if player and player.components.autofarm then
-        player.components.autofarm:Switch()
+    if ThePlayer and ThePlayer.components.autofarm and ThePlayer.HUD and not ThePlayer.HUD:HasInputFocus() then
+        ThePlayer.components.autofarm:Switch()
     end
 end
 
