@@ -1,3 +1,5 @@
+local scrapbookdata = require("screens/redux/scrapbookdata")
+
 local FARM_RADIUS = 30
 
 local WATERINGCANS = {
@@ -617,6 +619,8 @@ function AutoFarm:Start()
         end)
     end
 
+    self:ShowAutoFarmText("Auto Planting ...")
+
     local text = self.lang == "ZH" and "自动种田: 开启" or "Auto farming: Enable"
     self.inst.components.talker:Say(text)
 end
@@ -632,6 +636,8 @@ function AutoFarm:Stop()
     self.target = nil
     self.state = nil
     self.state_cd = 0
+
+    self:HideAutoFarmText() -- ✅ 新增
 
     local text = self.lang == "ZH" and "自动种田: 关闭" or "Auto farming: Disable"
     self.inst.components.talker:Say(text)
@@ -657,6 +663,127 @@ end
 
 function AutoFarm:SetLanguage(lang)
     self.lang = lang
+end
+
+-------------------------------------------------
+-- AutoFarm UI（图标 + 文本 + 跟随玩家）
+-------------------------------------------------
+
+local Widget = require "widgets/widget"
+local Image = require "widgets/image"
+local Text = require "widgets/text"
+
+function AutoFarm:CreateAutoFarmText()
+    if self.af_root then return end
+    if not ThePlayer or not ThePlayer.HUD then return end
+
+    -------------------------------------------------
+    -- 根节点
+    -------------------------------------------------
+    self.af_root = ThePlayer.HUD.overlayroot:AddChild(Widget("AutoFarmUI"))
+
+    -------------------------------------------------
+    -- 图标
+    -------------------------------------------------
+    local tex = scrapbookdata["golden_farm_hoe"] and scrapbookdata["golden_farm_hoe"].tex or scrapbookdata["playing_card"].tex
+    local atlas = resolvefilepath(GetInventoryItemAtlas(tex))
+    self.af_icon = self.af_root:AddChild(Image(atlas, tex))
+    self.af_icon:SetScale(1)
+
+    -------------------------------------------------
+    -- 文本
+    -------------------------------------------------
+    self.af_text = self.af_root:AddChild(Text(BODYTEXTFONT, 50))
+    self.af_text:SetColour(0.6, 1, 0.6, 1)
+
+    -------------------------------------------------
+    -- 对齐（关键）
+    -------------------------------------------------
+    self:LayoutAutoFarmUI()
+
+    self.af_root:Hide()
+end
+
+-------------------------------------------------
+-- 🔧 对齐逻辑（核心）
+-------------------------------------------------
+function AutoFarm:LayoutAutoFarmUI()
+    if not self.af_icon or not self.af_text then return end
+
+    local spacing = 10
+
+    local text_w, text_h = self.af_text:GetRegionSize()
+    local icon_w = 40 -- 经验值（0.5 scale 下差不多）
+
+    local total_w = icon_w + spacing + text_w
+
+    -- 图标在左
+    self.af_icon:SetPosition(-total_w/2 + icon_w/2, 0)
+
+    -- 文本在右
+    self.af_text:SetPosition(-total_w/2 + icon_w + spacing + text_w/2, 0)
+end
+
+-------------------------------------------------
+-- 显示
+-------------------------------------------------
+function AutoFarm:ShowAutoFarmText(str)
+    self:CreateAutoFarmText()
+    if not self.af_root then return end
+
+    self.af_text:SetString(str or "Auto Planting ...")
+
+    -- ⚠️ 文本变化后要重新排版
+    self:LayoutAutoFarmUI()
+
+    self.af_root:Show()
+
+    -- 开启跟随
+    if not self.af_task then
+        self.af_task = self.inst:DoPeriodicTask(0, function()
+            self:UpdateAutoFarmUIPos()
+        end)
+    end
+end
+
+-------------------------------------------------
+-- 隐藏
+-------------------------------------------------
+function AutoFarm:HideAutoFarmText()
+    if self.af_root then
+        self.af_root:Hide()
+    end
+
+    if self.af_task then
+        self.af_task:Cancel()
+        self.af_task = nil
+    end
+end
+
+-------------------------------------------------
+-- 跟随玩家（核心）
+-------------------------------------------------
+function AutoFarm:UpdateAutoFarmUIPos()
+    if not self.af_root or not self.inst then return end
+
+    local x, y, z = self.inst.Transform:GetWorldPosition()
+
+    -- 转屏幕坐标
+    local sx, sy = TheSim:GetScreenPos(x, y+3, z) -- 2.5 = 头顶高度
+
+    if sx and sy then
+        self.af_root:SetPosition(sx, sy, 0)
+    end
+end
+
+-------------------------------------------------
+-- 删除
+-------------------------------------------------
+function AutoFarm:RemoveAutoFarmText()
+    if self.af_root then
+        self.af_root:Kill()
+        self.af_root = nil
+    end
 end
 
 return AutoFarm
