@@ -18,7 +18,7 @@ description = en_zh({
 author = "TUTU"
 
 --A version number so you can ask people if they are running an old version of your mod.
-version = "1.0.0"
+version = "1.0.1"
 
 --This lets other players know if your mod is out of date. This typically needs to be updated every time there's a new game update.
 api_version = 10
@@ -49,9 +49,9 @@ configuration_options={ --模组变量配置
         label = en_zh({en = "language", zh = "语言"}),
         options = {
 			AddOption("English", "EN"),
-			AddOption("中文", "ZH"),
+			AddOption("中文", "CN"),
         },
-        default = "ZH",
+        default = "CN",
     },
     {
         name = "CFG_KEY",
@@ -86,6 +86,30 @@ configuration_options={ --模组变量配置
 			AddOption("F11", 292),
         },
         default = 111,
+    },
+    {
+        name = "CFG_SHOW_STATE",
+        -- hover = "",
+        label = en_zh({en = "Display Status", zh = "显示状态"}),
+        options = {
+			AddOption(en_zh({en = "Enable", zh = "启用"}), true),
+			AddOption(en_zh({en = "Disable", zh = "关闭"}), false),
+        },
+        default = true,
+    },
+    {
+        name = "CFG_STATUS_HEIGHT",
+		hover = en_zh({ -- 优化点2：补充详细的悬停提示
+			en = "Adjust the vertical position of the status text/icon above your character's head.",
+			zh = "调整状态文字/图标在角色头顶的垂直显示高度。"
+		}),
+        label = en_zh({en = "Status HUD Height", zh = "状态提示高度"}),
+        options = {
+			AddOption(en_zh({en = "High", zh = "较高"}), 4.25),
+			AddOption(en_zh({en = "Normal", zh = "默认"}), 2.5),
+			AddOption(en_zh({en = "Bottom", zh = "底部"}), -1),
+        },
+        default = 2.5,
     },
 }
 

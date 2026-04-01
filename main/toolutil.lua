@@ -11,6 +11,12 @@ function GetEquippedItem(inst, equipslot)
     return inst.replica.inventory and inst.replica.inventory:GetEquippedItem(equipslot) or nil
 end
 
+function GetAnimation(ent)
+	if ent == nil then return end
+	local a, anim, c, d, e, f = ent.AnimState:GetHistoryData()
+	return tostring(anim)
+end
+
 function IsBusy(player)
 	local busy_anims ={
 		"atk",
@@ -112,6 +118,12 @@ function FindFirstItemInContainers(inst, fn)
     end
 
     return nil, nil, nil
+end
+
+function PutAllOfActiveItemInCont(inst)
+    if inst.replica.inventory then
+        inst.replica.inventory:ReturnActiveItem()
+    end
 end
 
 function GetItemPercentused(item)

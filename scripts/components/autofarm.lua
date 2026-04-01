@@ -120,6 +120,9 @@ local AutoFarm = Class(function(self, inst)
     self.state = nil
     self.target = nil
 
+    self.show_status = true
+    self.height = 2.5
+
     self.state_cd = 0
 
     self.pos = nil
@@ -544,7 +547,7 @@ function AutoFarm:Stop()
     self.state = nil
     self.state_cd = 0
 
-    ClearState(self.inst,"FARM")
+    -- ClearState(self.inst,"FARM")
 end
 
 -------------------------------------------------
@@ -585,9 +588,15 @@ function AutoFarm:Enable()
     self:UpdateButtonAppearance()
 
     -- 显示状态
-    if self.inst.HUD then
-        local atlas, tex = GetAtlasAndTex("golden_farm_hoe")
-        self.inst.HUD:ShowStatusDisplayer(atlas, tex, STRINGS.AUTOFARM.FARMING)
+    if self.inst.HUD and self.show_status then
+        local tex = "golden_farm_hoe.tex"
+        local atlas = resolvefilepath(GetInventoryItemAtlas(tex))
+        self.inst.HUD:ShowStatusDisplayer(atlas, tex, STRINGS.AUTOFARM.FARMING, self.height or 2.5)
+    else
+        local current = self:IsEnabled()
+        local text = current and STRINGS.AUTOFARM.ENABLED or STRINGS.AUTOFARM.DISABLED
+
+        self.inst.components.talker:Say(STRINGS.AUTOFARM.MANE.. ": " .. text)
     end
 end
 
@@ -597,13 +606,25 @@ function AutoFarm:Disable()
     self:UpdateButtonAppearance()
 
     -- 隐藏状态
-    if self.inst.HUD then
+    if self.inst.HUD and self.show_status then
         self.inst.HUD:HideStatusDisplayer()
+    else
+        local current = self:IsEnabled()
+        local text = current and STRINGS.AUTOFARM.ENABLED or STRINGS.AUTOFARM.DISABLED
+
+        self.inst.components.talker:Say(STRINGS.AUTOFARM.MANE.. ": " .. text)
     end
 end
 
 function AutoFarm:IsEnabled()
     return self.enabled
+end
+function AutoFarm:SetShowStatus(bool)
+    self.show_status = bool
+end
+
+function AutoFarm:SetStatusHeight(height)
+    self.height = height
 end
 
 function AutoFarm:UpdateButtonAppearance()

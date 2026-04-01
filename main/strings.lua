@@ -1,11 +1,12 @@
 GLOBAL.setmetatable(env, {__index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end })
 
-local lang = GetModConfigData("LANGUAGE")
- 
-local function en_zh(string) 
+local lang = GetModConfigData("CFG_LANGUAGE")
+
+local function en_zh(string)
     return string[lang] or string["EN"]
 end
 
+STRINGS.AUTOFARM = {}
 STRINGS.AUTOFARM.ENABLED = en_zh({
     EN = "Enabled",
     CN = "启用",
