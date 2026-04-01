@@ -1,5 +1,3 @@
-local scrapbookdata = require("screens/redux/scrapbookdata")
-
 local PLENV = env
 GLOBAL.setfenv(1, GLOBAL)
 

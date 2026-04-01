@@ -523,7 +523,6 @@ end
 -------------------------------------------------
 
 function AutoFarm:Start()
-
     if not self.enabled then
         self:Stop()
         return
@@ -537,7 +536,6 @@ function AutoFarm:Start()
 end
 
 function AutoFarm:Stop()
-
     if self.task then
         self.task:Cancel()
         self.task = nil
@@ -631,11 +629,6 @@ function AutoFarm:UpdateButtonAppearance()
     if not self.icon_button then
         return
     end
-
-    local current = self:IsEnabled()
-    local text = current and STRINGS.AUTOFARM.ENABLED or STRINGS.AUTOFARM.DISABLED
-
-    self.inst.components.talker:Say(STRINGS.AUTOFARM.MANE.. ": " .. text)
 
     if self.enabled then
         self.icon_button:SetTint(1, 1, 1, 1)
