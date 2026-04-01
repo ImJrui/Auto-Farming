@@ -1,5 +1,3 @@
-local scrapbookdata = require("screens/redux/scrapbookdata")
-
 local FARM_RADIUS = 30
 
 local WATERINGCANS = {
@@ -70,102 +68,6 @@ end
 -------------------------------------------------
 -- 工具函数
 -------------------------------------------------
-local function GetEquippedItem(inst, equipslot)
-    return inst.replica.inventory and inst.replica.inventory:GetEquippedItem(equipslot) or nil
-end
-
-local function FindFirstItem(inst, fn)
-    local function filter_fn(item)
-        if fn then
-            return fn(item)
-        end
-        return true
-    end
-
-    local invent = inst.replica.inventory
-
-    -- Cheak Active Item
-    local activeitem = invent:GetActiveItem()
-    if activeitem and filter_fn(activeitem) then
-        return activeitem
-    end
-
-    -- Check Inventory
-    for _, item in pairs(invent:GetItems()) do
-        if item and filter_fn(item) then
-            return item
-        end
-    end
-
-    -- Check Equips Containers
-    local equips = invent:GetEquips()
-    for _, equip in pairs(equips) do
-        if filter_fn(equip) then
-            return equip
-        end
-
-        local container = equip.replica.container
-        if container then
-            for i = 1, container:GetNumSlots() do
-                local item = container:GetItemInSlot(i)
-                if item and filter_fn(item) then
-                    return item
-                end
-            end
-        end
-    end
-
-    return nil
-end
-
-local function FindFirstItemInContainers(inst, fn)
-    local function filter_fn(item)
-        if fn then
-            return fn(item)
-        end
-        return true
-    end
-
-    local invent = inst.replica.inventory
-
-    -- Check Inventory
-    for slot = 1, invent:GetNumSlots() do
-        local item = invent:GetItemInSlot(slot)
-        if item and filter_fn(item) then
-            return item, invent, slot
-        end
-    end
-
-    -- Check Equips Containers
-    local equips = invent:GetEquips()
-    for _, equip in pairs(equips) do
-        local container = equip.replica.container
-        if container then
-            for slot = 1, container:GetNumSlots() do
-                local item = container:GetItemInSlot(slot)
-                if item and filter_fn(item) then
-                    return item, container, slot
-                end
-            end
-        end
-    end
-
-    return nil, nil, nil
-end
-
-local function GetItemPercentused(item)
-    if item.replica and item.replica.inventoryitem then
-        local classified = item.replica.inventoryitem.classified
-        if classified and classified.percentused then
-            return classified.percentused:value() / 100
-        end
-    end
-    return 0
-end
-
-local function DebugPrint(...)
-    print("[AutoFarm]", ...)
-end
 
 local function GetMoisture(soil)
 
@@ -211,6 +113,7 @@ end
 local AutoFarm = Class(function(self, inst)
 
     self.inst = inst
+    self.cmp_name = "autofarm"
 
     self.enabled = false
 
@@ -229,7 +132,6 @@ local AutoFarm = Class(function(self, inst)
     self.mode_index = 1
     self.modes = {false,true}
 
-    self.lang = "EN"
 end)
 
 -------------------------------------------------
@@ -250,13 +152,22 @@ function AutoFarm:OnUpdate()
         return
     end
 
+    -- if not CanRunState(self.inst,"FARM") then
+    --     return
+    -- end
+
+    if IsBusy(self.inst) then
+        return
+    end
+
     -------------------------------------------------
     -- 执行当前目标
     -------------------------------------------------
 
     if self.target and IsValid(self.target) then
+        -- SetState(self.inst, "FARM")
 
-        self.inst.replica.inventory:ReturnActiveItem()
+        PutAllOfActiveItemInCont(self.inst)
 
         if self.state == "PHONOGRAPH" then
             if self:DoPhonograph() then return end
@@ -296,7 +207,8 @@ function AutoFarm:OnUpdate()
     if self:FindPlant() then return end
     -- if self:FindFill() then return end
 
-    self:SetStateCD(1)
+    self:Wait(1)
+    -- ClearState(self.inst, "FARM")
 end
 
 -------------------------------------------------
@@ -306,7 +218,7 @@ function AutoFarm:FindPhonograph()
     local ents = TheSim:FindEntities(self.pos.x, 0, self.pos.z, FARM_RADIUS, {"recordplayer", "enabled"}, {"turnedon"})
     for _,phonograph in ipairs(ents) do
         local pos = phonograph:GetPosition()
-        local plants = TheSim:FindEntities(pos.x, pos.y, pos.z, TUNING.PHONOGRAPH_TEND_RANGE, {"tendable_farmplant"})
+        local plants = TheSim:FindEntities(pos.x, pos.y, pos.z, TUNING.PHONOGRAPH_TEND_RANGE, {"tendable_farmplant"}, {"weed"})
         if #plants > 0 then
             self.target = phonograph
             self:SetState("PHONOGRAPH")
@@ -328,7 +240,7 @@ function AutoFarm:DoPhonograph()
     SendRPCToServer(RPC.RightClick, ACTIONS.TURNON.code, pos.x, pos.z, self.target)
 
     DebugPrint("On Task: Open Phonograph")
-    self:SetStateCD(0.5)
+    self:Wait(0.5)
     return true
 end
 
@@ -344,7 +256,7 @@ function AutoFarm:FindSoil()
             local ents = TheWorld.Map:GetEntitiesOnTileAtPoint(pos.x, pos.y, pos.z)
             for i = 1, #ents do
                 if ents[i]:HasTag("farm_plant") and not ents[i]:HasTag("pickable") and not ents[i]:HasTag("weed") then
-                    if GetMoisture(soil) < 0.75 then
+                    if GetMoisture(soil) < 0.5 then
                         local hands = GetEquippedItem(self.inst, EQUIPSLOTS.HANDS)
                         if hands and hands:HasTag("wateringcan") and GetItemPercentused(hands) > 0.01 then
                             self.target = soil
@@ -359,7 +271,7 @@ function AutoFarm:FindSoil()
                             SendRPCToServer(RPC.UseItemFromInvTile, ACTIONS.EQUIP.code, wateringcan)
                             self.target = soil
                             self:SetState("WATER")
-                            self:SetStateCD(0.2)
+                            self:Wait(0.2)
                             return true
                         end
                     end
@@ -398,7 +310,7 @@ function AutoFarm:DoWater()
         local pos = self.target:GetPosition()
         SendRPCToServer(RPC.RightClick, ACTIONS.POUR_WATER_GROUNDTILE.code, pos.x, pos.z, nil, nil, true, nil)
 
-        self:SetStateCD(1)
+        self:Wait(1)
 
         DebugPrint("On Task: Watering Soil")
         return true
@@ -438,7 +350,7 @@ function AutoFarm:DoFertilize()
             SendRPCToServer(RPC.LeftClick, ACTIONS.DEPLOY.code, pos.x, pos.z, nil, true, nil)
 
             DebugPrint("On Task: Fertilize Soil (Multi)")
-            self:SetStateCD(0.3)
+            self:Wait(0.3)
             return true
         end
         -- ⚠️ 如果没有复合肥，不return，继续走下面单项逻辑
@@ -464,7 +376,7 @@ function AutoFarm:DoFertilize()
                 SendRPCToServer(RPC.LeftClick, ACTIONS.DEPLOY.code, pos.x, pos.z, nil, true, nil)
 
                 DebugPrint("On Task: Fertilize Soil ("..type..")")
-                self:SetStateCD(0.3)
+                self:Wait(0.3)
                 return true
             end
         end
@@ -496,13 +408,11 @@ function AutoFarm:FindWeed()
                 SendRPCToServer(RPC.UseItemFromInvTile, ACTIONS.EQUIP.code, shovel)
                 self.target = weed
                 self:SetState("WEED")
-                self:SetStateCD(0.2)
+                self:Wait(0.2)
                 return true
             end
         end
     end
-
-    return false
 end
 
 function AutoFarm:DoWeed()
@@ -519,7 +429,7 @@ function AutoFarm:DoWeed()
     SendRPCToServer(RPC.RightClick, ACTIONS.DIG.code, pos.x, pos.z, self.target)
 
     DebugPrint("On Task: Weeding")
-    self:SetStateCD(0.4)
+    self:Wait(0.4)
     return true
 
 end
@@ -558,7 +468,7 @@ function AutoFarm:DoTalk()
     SendRPCToServer(RPC.LeftClick, ACTIONS.INTERACT_WITH.code, pos.x, pos.z, self.target, true, nil)
 
     DebugPrint("On Task: Talk To Farm Plant")
-    self:SetStateCD(0.5)
+    self:Wait(0.5)
     return true
 end
 
@@ -600,7 +510,7 @@ function AutoFarm:DoFill()
         self.target
     )
 
-    self:SetStateCD(0.8)
+    self:Wait(0.8)
     return true
 
 end
@@ -611,22 +521,19 @@ end
 
 function AutoFarm:Start()
 
-    self.enabled = true
+    if not self.enabled then
+        self:Stop()
+        return
+    end
 
     if self.task == nil then
         self.task = self.inst:DoPeriodicTask(self.freq,function()
             self:OnUpdate()
         end)
     end
-
-    self:ShowAutoFarmText("Auto Planting ...")
-
-    local text = self.lang == "ZH" and "自动种田: 开启" or "Auto farming: Enable"
-    self.inst.components.talker:Say(text)
 end
 
 function AutoFarm:Stop()
-    self.enabled = false
 
     if self.task then
         self.task:Cancel()
@@ -637,11 +544,85 @@ function AutoFarm:Stop()
     self.state = nil
     self.state_cd = 0
 
-    self:HideAutoFarmText() -- ✅ 新增
-
-    local text = self.lang == "ZH" and "自动种田: 关闭" or "Auto farming: Disable"
-    self.inst.components.talker:Say(text)
+    ClearState(self.inst,"FARM")
 end
+
+-------------------------------------------------
+-- 模式
+-------------------------------------------------
+
+function AutoFarm:SetIconButton(button)
+    self.icon_button = button
+end
+
+function AutoFarm:SetMode(index)
+    self.mode_index = index
+    local mode = self.modes[self.mode_index]
+    if mode then
+        self:Enable()
+    else
+        self:Disable()
+    end
+
+    -- SetComponentCache(self.cmp_name, {mode_index = self.mode_index})
+end
+
+function AutoFarm:SetNextMode()
+    local next_index = self.mode_index + 1
+    if next_index > #self.modes then
+        next_index = 1
+    end
+    self:SetMode(next_index)
+end
+
+-------------------------------------------------
+-- Enable Disable
+-------------------------------------------------
+
+function AutoFarm:Enable()
+    self.enabled = true
+    self:Start()
+    self:UpdateButtonAppearance()
+
+    -- 显示状态
+    if self.inst.HUD then
+        local atlas, tex = GetAtlasAndTex("golden_farm_hoe")
+        self.inst.HUD:ShowStatusDisplayer(atlas, tex, STRINGS.AUTOFARM.FARMING)
+    end
+end
+
+function AutoFarm:Disable()
+    self.enabled = false
+    self:Stop()
+    self:UpdateButtonAppearance()
+
+    -- 隐藏状态
+    if self.inst.HUD then
+        self.inst.HUD:HideStatusDisplayer()
+    end
+end
+
+function AutoFarm:IsEnabled()
+    return self.enabled
+end
+
+function AutoFarm:UpdateButtonAppearance()
+    if not self.icon_button then
+        return
+    end
+
+    local current = self:IsEnabled()
+    local text = current and STRINGS.AUTOFARM.ENABLED or STRINGS.AUTOFARM.DISABLED
+
+    self.inst.components.talker:Say(STRINGS.AUTOFARM.MANE.. ": " .. text)
+
+    if self.enabled then
+        self.icon_button:SetTint(1, 1, 1, 1)
+    else
+        self.icon_button:SetTint(0,0,0,0.5)
+    end
+end
+
 -------------------------------------------------
 -- 工具
 -------------------------------------------------
@@ -649,141 +630,8 @@ function AutoFarm:SetState(state)
     self.state = state
 end
 
-function AutoFarm:SetStateCD(time)
+function AutoFarm:Wait(time)
     self.state_cd = time
-end
-
-function AutoFarm:Switch()
-    if self.enabled then
-        self:Stop()
-    else
-        self:Start()
-    end
-end
-
-function AutoFarm:SetLanguage(lang)
-    self.lang = lang
-end
-
--------------------------------------------------
--- AutoFarm UI（图标 + 文本 + 跟随玩家）
--------------------------------------------------
-
-local Widget = require "widgets/widget"
-local Image = require "widgets/image"
-local Text = require "widgets/text"
-
-function AutoFarm:CreateAutoFarmText()
-    if self.af_root then return end
-    if not ThePlayer or not ThePlayer.HUD then return end
-
-    -------------------------------------------------
-    -- 根节点
-    -------------------------------------------------
-    self.af_root = ThePlayer.HUD.overlayroot:AddChild(Widget("AutoFarmUI"))
-
-    -------------------------------------------------
-    -- 图标
-    -------------------------------------------------
-    local tex = scrapbookdata["golden_farm_hoe"] and scrapbookdata["golden_farm_hoe"].tex or scrapbookdata["playing_card"].tex
-    local atlas = resolvefilepath(GetInventoryItemAtlas(tex))
-    self.af_icon = self.af_root:AddChild(Image(atlas, tex))
-    self.af_icon:SetScale(1)
-
-    -------------------------------------------------
-    -- 文本
-    -------------------------------------------------
-    self.af_text = self.af_root:AddChild(Text(BODYTEXTFONT, 50))
-    self.af_text:SetColour(0.6, 1, 0.6, 1)
-
-    -------------------------------------------------
-    -- 对齐（关键）
-    -------------------------------------------------
-    self:LayoutAutoFarmUI()
-
-    self.af_root:Hide()
-end
-
--------------------------------------------------
--- 🔧 对齐逻辑（核心）
--------------------------------------------------
-function AutoFarm:LayoutAutoFarmUI()
-    if not self.af_icon or not self.af_text then return end
-
-    local spacing = 10
-
-    local text_w, text_h = self.af_text:GetRegionSize()
-    local icon_w = 40 -- 经验值（0.5 scale 下差不多）
-
-    local total_w = icon_w + spacing + text_w
-
-    -- 图标在左
-    self.af_icon:SetPosition(-total_w/2 + icon_w/2, 0)
-
-    -- 文本在右
-    self.af_text:SetPosition(-total_w/2 + icon_w + spacing + text_w/2, 0)
-end
-
--------------------------------------------------
--- 显示
--------------------------------------------------
-function AutoFarm:ShowAutoFarmText(str)
-    self:CreateAutoFarmText()
-    if not self.af_root then return end
-
-    self.af_text:SetString(str or "Auto Planting ...")
-
-    -- ⚠️ 文本变化后要重新排版
-    self:LayoutAutoFarmUI()
-
-    self.af_root:Show()
-
-    -- 开启跟随
-    if not self.af_task then
-        self.af_task = self.inst:DoPeriodicTask(0, function()
-            self:UpdateAutoFarmUIPos()
-        end)
-    end
-end
-
--------------------------------------------------
--- 隐藏
--------------------------------------------------
-function AutoFarm:HideAutoFarmText()
-    if self.af_root then
-        self.af_root:Hide()
-    end
-
-    if self.af_task then
-        self.af_task:Cancel()
-        self.af_task = nil
-    end
-end
-
--------------------------------------------------
--- 跟随玩家（核心）
--------------------------------------------------
-function AutoFarm:UpdateAutoFarmUIPos()
-    if not self.af_root or not self.inst then return end
-
-    local x, y, z = self.inst.Transform:GetWorldPosition()
-
-    -- 转屏幕坐标
-    local sx, sy = TheSim:GetScreenPos(x, y+3, z) -- 2.5 = 头顶高度
-
-    if sx and sy then
-        self.af_root:SetPosition(sx, sy, 0)
-    end
-end
-
--------------------------------------------------
--- 删除
--------------------------------------------------
-function AutoFarm:RemoveAutoFarmText()
-    if self.af_root then
-        self.af_root:Kill()
-        self.af_root = nil
-    end
 end
 
 return AutoFarm
