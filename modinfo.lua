@@ -18,7 +18,7 @@ description = en_zh({
 author = "TUTU"
 
 --A version number so you can ask people if they are running an old version of your mod.
-version = "1.0.1"
+version = "1.0.2"
 
 --This lets other players know if your mod is out of date. This typically needs to be updated every time there's a new game update.
 api_version = 10
@@ -43,6 +43,15 @@ local function AddOption(KEY, data)
 end
 
 configuration_options={ --模组变量配置
+    {
+        name = "CFG_DEBUG_MODE",
+        label = en_zh({en = "Debug Mode", zh = "调试模式"}),
+        options = {
+			AddOption(en_zh({en = "Disable", zh = "关闭"}), false),
+			AddOption(en_zh({en = "Enable", zh = "启用"}), true),
+        },
+        default = false,
+    },
     {
         name = "CFG_LANGUAGE",
         -- hover = "",

@@ -1,4 +1,5 @@
 modimport("main/strings")
+modimport("main/constants")
 modimport("main/toolutil")
 
 GLOBAL.setmetatable(env, {
@@ -36,19 +37,46 @@ local CFG_STATUS_HEIGHT = GetModConfigData("CFG_STATUS_HEIGHT")
 AddPlayerPostInit(function(inst)
     if not TheWorld.ismastersim then
         inst:AddComponent("autofarm")
+        inst:AddComponent("autoplant")
         inst.components.autofarm:SetShowStatus(CFG_SHOW_STATE)
         inst.components.autofarm:SetStatusHeight(CFG_STATUS_HEIGHT)
+        inst.components.autoplant:SetShowStatus(CFG_SHOW_STATE)
+        inst.components.autoplant:SetStatusHeight(CFG_STATUS_HEIGHT)
     end
 end)
 
 --------------------------------------------------
--- Toggle
+-- Toggle / Open ComboScreen
+-- Key press = toggle: OFF → open ComboScreen, ON → disable all
 --------------------------------------------------
 local function Toggle()
-    if ThePlayer and ThePlayer.components.autofarm and ThePlayer.HUD and not ThePlayer.HUD:HasInputFocus() then
-        ThePlayer.components.autofarm:SetNextMode()
+    if not ThePlayer or not ThePlayer.HUD or ThePlayer.HUD:HasInputFocus() then
+        return
+    end
+
+    local autofarm = ThePlayer.components.autofarm
+    local autoplant = ThePlayer.components.autoplant
+
+    local is_running = (autofarm and autofarm:IsEnabled()) or (autoplant and autoplant:IsEnabled())
+
+    if is_running then
+        -- Disable all
+        if autofarm then autofarm:Disable() end
+        if autoplant then autoplant:Disable() end
+        ThePlayer.HUD:HideStatusDisplayer()
+        ThePlayer.HUD:CloseComboScreen()
+        ThePlayer.HUD:CloseComboConfirmScreen()
+    else
+        -- Open ComboScreen
+        if autoplant then
+            autoplant:OpenComboScreen()
+        end
     end
 end
 
 TheInput:AddKeyDownHandler(GetModConfigData("CFG_KEY"), Toggle)
 
+--------------------------------------------------
+-- ComboScreen Postinit
+--------------------------------------------------
+modimport("postinit/screens/playerhud")

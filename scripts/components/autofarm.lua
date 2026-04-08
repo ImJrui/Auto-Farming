@@ -587,7 +587,7 @@ function AutoFarm:Enable()
 
     -- 显示状态
     if self.inst.HUD and self.show_status then
-        local tex = "golden_farm_hoe.tex"
+        local tex = "nutrientsgoggleshat.tex"
         local atlas = resolvefilepath(GetInventoryItemAtlas(tex))
         self.inst.HUD:ShowStatusDisplayer(atlas, tex, STRINGS.AUTOFARM.FARMING, self.height or 2.5)
     else

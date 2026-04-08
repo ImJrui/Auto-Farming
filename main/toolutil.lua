@@ -2,7 +2,7 @@ local PLENV = env
 GLOBAL.setfenv(1, GLOBAL)
 
 function DebugPrint(...)
-    print("[TSLM]", ...)
+    print("[AUTOFARM]", ...)
 end
 
 function GetEquippedItem(inst, equipslot)
@@ -133,3 +133,92 @@ function GetItemPercentused(item)
     end
     return 0
 end
+
+function FindItems(inst, fn)
+    local function filter_fn(item)
+        if fn then return fn(item) end
+        return true
+    end
+
+    local items = {}
+    local invent = inst.replica.inventory
+
+    local activeitem = invent:GetActiveItem()
+    if activeitem and filter_fn(activeitem) then
+        table.insert(items, activeitem)
+    end
+
+    for _, item in pairs(invent:GetItems()) do
+        if item and filter_fn(item) then
+            table.insert(items, item)
+        end
+    end
+
+    local equips = invent:GetEquips()
+    for _, equip in pairs(equips) do
+        if filter_fn(equip) then
+            table.insert(items, equip)
+        end
+        local container = equip.replica.container
+        if container then
+            for i = 1, container:GetNumSlots() do
+                local item = container:GetItemInSlot(i)
+                if item and filter_fn(item) then
+                    table.insert(items, item)
+                end
+            end
+        end
+    end
+
+    return items
+end
+
+function GetStackSize(item)
+    if item ~= nil and item.replica ~= nil and item.replica.stackable ~= nil then
+        return item.replica.stackable:StackSize()
+    end
+    return 1
+end
+
+function GetMaxSize(item)
+    if item ~= nil and item.replica ~= nil and item.replica.stackable ~= nil then
+        return item.replica.stackable:MaxSize()
+    end
+    return 1
+end
+
+function GetAtlasAndTex(prefabname)
+    local scrapbookdata = require("screens/redux/scrapbookdata")
+    local data = scrapbookdata[prefabname]
+    if data and data.tex then
+        return resolvefilepath(data.atlas or GetInventoryItemAtlas(data.tex)), data.tex
+    end
+    local tex = prefabname .. ".tex"
+    local atlas = GetInventoryItemAtlas(tex)
+    if atlas ~= nil then
+        return resolvefilepath(atlas), tex
+    end
+    return "images/lavaarena_unlocks.xml", "locked_creature_details.tex"
+end
+
+function GetWorldType()
+    if TheWorld then
+        if TheWorld:HasTag("forest") then
+            return WORLDTYPE.FOREST
+        elseif TheWorld:HasTag("cave") then
+            return WORLDTYPE.CAVE
+        elseif TheWorld:HasTag("island") then
+            return WORLDTYPE.SHIPWRECKED
+        elseif TheWorld:HasTag("volcano") then
+            return WORLDTYPE.VOLCANOWORLD
+        elseif TheWorld:HasTag("porkland") then
+            return WORLDTYPE.PORKLAND
+        end
+        return WORLDTYPE.UNKNOWN
+    end
+end
+
+-- no-op state coordination (no autostatemanager)
+local function SetState(inst, state) end
+local function ClearState(inst, state) end
+local function CanRunState(inst, state) return true end
