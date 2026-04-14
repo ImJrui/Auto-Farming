@@ -46,35 +46,38 @@ AddPlayerPostInit(function(inst)
 end)
 
 --------------------------------------------------
--- Toggle / Open ComboScreen
--- Key press = toggle: OFF → open ComboScreen, ON → disable all
+-- OnHotKey
+-- Hotkey = ON→OFF, OFF+Ctrl→continue, OFF→open menu
 --------------------------------------------------
-local function Toggle()
+local function OnHotKey()
     if not ThePlayer or not ThePlayer.HUD or ThePlayer.HUD:HasInputFocus() then
         return
     end
 
     local autofarm = ThePlayer.components.autofarm
     local autoplant = ThePlayer.components.autoplant
-
     local is_running = (autofarm and autofarm:IsEnabled()) or (autoplant and autoplant:IsEnabled())
 
     if is_running then
-        -- Disable all
         if autofarm then autofarm:Disable() end
         if autoplant then autoplant:Disable() end
         ThePlayer.HUD:HideStatusDisplayer()
         ThePlayer.HUD:CloseComboScreen()
         ThePlayer.HUD:CloseComboConfirmScreen()
+    elseif TheInput:IsKeyDown(KEY_CTRL) then
+        if autoplant and autoplant:HasUnfinishedTargets() then
+            autoplant:Enable()
+        else
+            autofarm:Enable()
+        end
     else
-        -- Open ComboScreen
         if autoplant then
             autoplant:OpenComboScreen()
         end
     end
 end
 
-TheInput:AddKeyDownHandler(GetModConfigData("CFG_KEY"), Toggle)
+TheInput:AddKeyDownHandler(GetModConfigData("CFG_KEY"), OnHotKey)
 
 --------------------------------------------------
 -- ComboScreen Postinit
