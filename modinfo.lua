@@ -93,6 +93,7 @@ configuration_options={ --模组变量配置
 			AddOption("F9", 290),
 			AddOption("F10", 291),
 			AddOption("F11", 292),
+			AddOption("F12", 293),
         },
         default = 111,
     },
