@@ -1,8 +1,12 @@
+local GetModConfigData = GetModConfigData
+
 local PLENV = env
 GLOBAL.setfenv(1, GLOBAL)
 
 function DebugPrint(...)
-    print("[AUTOFARM]", ...)
+    if GetModConfigData("CFG_DEBUG_MODE") then
+        print("[AUTOFARM]", ...)
+    end
 end
 
 function GetEquippedItem(inst, equipslot)
