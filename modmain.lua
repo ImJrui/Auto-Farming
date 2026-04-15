@@ -1,6 +1,6 @@
-modimport("main/strings")
 modimport("main/constants")
 modimport("main/toolutil")
+modimport("main/strings")
 
 GLOBAL.setmetatable(env, {
     __index = function(t, k)

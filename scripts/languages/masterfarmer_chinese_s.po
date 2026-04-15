@@ -1,0 +1,101 @@
+msgid ""
+msgstr ""
+"Language: zh-CN\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT Version: 2.0\n"
+
+#. STRINGS.AUTOFARM.ENABLED
+msgctxt "STRINGS.AUTOFARM.ENABLED"
+msgid "Enabled"
+msgstr "启用"
+
+#. STRINGS.AUTOFARM.DISABLED
+msgctxt "STRINGS.AUTOFARM.DISABLED"
+msgid "Disabled"
+msgstr "关闭"
+
+#. STRINGS.AUTOFARM.NAME
+msgctxt "STRINGS.AUTOFARM.NAME"
+msgid "Auto Farm"
+msgstr "自动种地"
+
+#. STRINGS.AUTOFARM.FARMING
+msgctxt "STRINGS.AUTOFARM.FARMING"
+msgid "Auto Farming..."
+msgstr "自动照料中..."
+
+#. STRINGS.AUTOPLANT.ENABLED
+msgctxt "STRINGS.AUTOPLANT.ENABLED"
+msgid "Enabled"
+msgstr "启用"
+
+#. STRINGS.AUTOPLANT.DISABLED
+msgctxt "STRINGS.AUTOPLANT.DISABLED"
+msgid "Disabled"
+msgstr "关闭"
+
+#. STRINGS.AUTOPLANT.NAME
+msgctxt "STRINGS.AUTOPLANT.NAME"
+msgid "Auto Plant"
+msgstr "自动种植"
+
+#. STRINGS.AUTOPLANT.PLANTING
+msgctxt "STRINGS.AUTOPLANT.PLANTING"
+msgid "Auto Planting..."
+msgstr "自动耕种中..."
+
+#. STRINGS.AUTOPLANT.COMBO_LIST
+msgctxt "STRINGS.AUTOPLANT.COMBO_LIST"
+msgid "Combo List"
+msgstr "组合列表"
+
+#. STRINGS.AUTOPLANT.CONTINUE
+msgctxt "STRINGS.AUTOPLANT.CONTINUE"
+msgid "Continue"
+msgstr "继续"
+
+#. STRINGS.AUTOPLANT.CANCEL
+msgctxt "STRINGS.AUTOPLANT.CANCEL"
+msgid "Cancel"
+msgstr "取消"
+
+#. STRINGS.AUTOPLANT.PRIORITY
+msgctxt "STRINGS.AUTOPLANT.PRIORITY"
+msgid "Priority:"
+msgstr "优先级:"
+
+#. STRINGS.AUTOPLANT.NOT_IN_SEASON
+msgctxt "STRINGS.AUTOPLANT.NOT_IN_SEASON"
+msgid "Not in Season"
+msgstr "不在季节"
+
+#. STRINGS.AUTOPLANT.UNKNOWN
+msgctxt "STRINGS.AUTOPLANT.UNKNOWN"
+msgid "Unknown"
+msgstr "未知"
+
+#. STRINGS.AUTOPLANT.PLANT_COMBO
+msgctxt "STRINGS.AUTOPLANT.PLANT_COMBO"
+msgid "Plant this combo?"
+msgstr "种植此组合？"
+
+#. STRINGS.AUTOPLANT.SEEDS_INSUFFICIENT
+msgctxt "STRINGS.AUTOPLANT.SEEDS_INSUFFICIENT"
+msgid "Seeds are insufficient"
+msgstr "种子不足"
+
+#. STRINGS.AUTOPLANT.CLEAR_FARM_SOIL
+msgctxt "STRINGS.AUTOPLANT.CLEAR_FARM_SOIL"
+msgid "Clear farm soil first"
+msgstr "请先清理农田土壤"
+
+#. STRINGS.AUTOPLANT.TILES_2
+msgctxt "STRINGS.AUTOPLANT.TILES_2"
+msgid "2 Tiles"
+msgstr "2 格"
+
+#. STRINGS.AUTOPLANT.TILES_4
+msgctxt "STRINGS.AUTOPLANT.TILES_4"
+msgid "4 Tiles"
+msgstr "4 格"

@@ -594,7 +594,7 @@ function AutoFarm:Enable()
         local current = self:IsEnabled()
         local text = current and STRINGS.AUTOFARM.ENABLED or STRINGS.AUTOFARM.DISABLED
 
-        self.inst.components.talker:Say(STRINGS.AUTOFARM.MANE.. ": " .. text)
+        self.inst.components.talker:Say(STRINGS.AUTOFARM.NAME.. ": " .. text)
     end
 end
 
@@ -610,7 +610,7 @@ function AutoFarm:Disable()
         local current = self:IsEnabled()
         local text = current and STRINGS.AUTOFARM.ENABLED or STRINGS.AUTOFARM.DISABLED
 
-        self.inst.components.talker:Say(STRINGS.AUTOFARM.MANE.. ": " .. text)
+        self.inst.components.talker:Say(STRINGS.AUTOFARM.NAME.. ": " .. text)
     end
 end
 

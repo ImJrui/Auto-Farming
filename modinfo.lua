@@ -53,16 +53,6 @@ configuration_options={ --模组变量配置
         default = false,
     },
     {
-        name = "CFG_LANGUAGE",
-        -- hover = "",
-        label = en_zh({en = "language", zh = "语言"}),
-        options = {
-			AddOption("English", "EN"),
-			AddOption("中文", "CN"),
-        },
-        default = "CN",
-    },
-    {
         name = "CFG_KEY",
         -- hover = "",
         label = en_zh({en = "key", zh = "按键"}),

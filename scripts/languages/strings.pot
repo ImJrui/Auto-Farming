@@ -1,0 +1,97 @@
+"Application: Don't Starve\n"
+"POT Version: 2.0\n"
+
+#. STRINGS.AUTOFARM.ENABLED
+msgctxt "STRINGS.AUTOFARM.ENABLED"
+msgid "Enabled"
+msgstr ""
+
+#. STRINGS.AUTOFARM.DISABLED
+msgctxt "STRINGS.AUTOFARM.DISABLED"
+msgid "Disabled"
+msgstr ""
+
+#. STRINGS.AUTOFARM.NAME
+msgctxt "STRINGS.AUTOFARM.NAME"
+msgid "Auto Farm"
+msgstr ""
+
+#. STRINGS.AUTOFARM.FARMING
+msgctxt "STRINGS.AUTOFARM.FARMING"
+msgid "Auto Farming..."
+msgstr ""
+
+#. STRINGS.AUTOPLANT.ENABLED
+msgctxt "STRINGS.AUTOPLANT.ENABLED"
+msgid "Enabled"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.DISABLED
+msgctxt "STRINGS.AUTOPLANT.DISABLED"
+msgid "Disabled"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.NAME
+msgctxt "STRINGS.AUTOPLANT.NAME"
+msgid "Auto Plant"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.PLANTING
+msgctxt "STRINGS.AUTOPLANT.PLANTING"
+msgid "Auto Planting..."
+msgstr ""
+
+#. STRINGS.AUTOPLANT.COMBO_LIST
+msgctxt "STRINGS.AUTOPLANT.COMBO_LIST"
+msgid "Combo List"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.CONTINUE
+msgctxt "STRINGS.AUTOPLANT.CONTINUE"
+msgid "Continue"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.CANCEL
+msgctxt "STRINGS.AUTOPLANT.CANCEL"
+msgid "Cancel"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.PRIORITY
+msgctxt "STRINGS.AUTOPLANT.PRIORITY"
+msgid "Priority:"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.NOT_IN_SEASON
+msgctxt "STRINGS.AUTOPLANT.NOT_IN_SEASON"
+msgid "Not in Season"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.UNKNOWN
+msgctxt "STRINGS.AUTOPLANT.UNKNOWN"
+msgid "Unknown"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.PLANT_COMBO
+msgctxt "STRINGS.AUTOPLANT.PLANT_COMBO"
+msgid "Plant this combo?"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.SEEDS_INSUFFICIENT
+msgctxt "STRINGS.AUTOPLANT.SEEDS_INSUFFICIENT"
+msgid "Seeds are insufficient"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.CLEAR_FARM_SOIL
+msgctxt "STRINGS.AUTOPLANT.CLEAR_FARM_SOIL"
+msgid "Clear farm soil first"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.TILES_2
+msgctxt "STRINGS.AUTOPLANT.TILES_2"
+msgid "2 Tiles"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.TILES_4
+msgctxt "STRINGS.AUTOPLANT.TILES_4"
+msgid "4 Tiles"
+msgstr ""

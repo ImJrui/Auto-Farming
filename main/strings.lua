@@ -1,36 +1,39 @@
-GLOBAL.setmetatable(env, {__index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end })
+local MODROOT = MODROOT
+local PLENV = env
+GLOBAL.setfenv(1, GLOBAL)
+require("translator")
 
-local lang = GetModConfigData("CFG_LANGUAGE")
+local languages = {
+    zh = "chinese_s",
+    zhr = "chinese_s",
+    ch = "chinese_s",
+    chs = "chinese_s",
+    sc = "chinese_s",
+    zht = "chinese_s",
+    tc = "chinese_s",
+    cht = "chinese_s",
+}
 
-local function en_zh(string)
-    return string[lang] or string["EN"]
+local function import(module_name)
+    module_name = module_name .. ".lua"
+    local result = kleiloadlua(MODROOT .. "strings/" .. module_name)
+
+    if result == nil then
+        error("Strings file not found: " .. module_name)
+    elseif type(result) == "string" then
+        error("Error loading strings/" .. module_name .. "!\n" .. result)
+    else
+        setfenv(result, PLENV)
+        return result()
+    end
 end
 
-STRINGS.AUTOFARM = {
-    ENABLED = en_zh({EN = "Enabled", CN = "启用"}),
-    DISABLED = en_zh({EN = "Disabled", CN = "关闭"}),
-    MANE = en_zh({EN = "Auto Farm", CN = "自动种地"}),
-    FARMING = en_zh({EN = "Auto Farming...", CN = "自动照料中..."}),
-}
+-- 加载字符串表
+ToolUtil.MergeTable(STRINGS, import("common"), true)
 
-STRINGS.AUTOPLANT = {
-    ENABLED = en_zh({EN = "Enabled", CN = "启用"}),
-    DISABLED = en_zh({EN = "Disabled", CN = "关闭"}),
-    MANE = en_zh({EN = "Auto Plant", CN = "自动种植"}),
-    PLANTING = en_zh({EN = "Auto Planting...", CN = "自动耕种中..."}),
-
-    -- ComboScreen
-    COMBO_LIST = en_zh({EN = "Combo List", CN = "组合列表"}),
-    CONTINUE = en_zh({EN = "Continue", CN = "继续"}),
-    CANCEL = en_zh({EN = "Cancel", CN = "取消"}),
-    PRIORITY = en_zh({EN = "Priority:", CN = "优先级:"}),
-    NOT_IN_SEASON = en_zh({EN = "Not in Season", CN = "不在季节"}),
-    UNKNOWN = en_zh({EN = "Unknown", CN = "未知"}),
-
-    -- ComboConfirmScreen
-    PLANT_COMBO = en_zh({EN = "Plant this combo?", CN = "种植此组合？"}),
-    SEEDS_INSUFFICIENT = en_zh({EN = "Seeds are insufficient", CN = "种子不足"}),
-    CLEAR_FARM_SOIL = en_zh({EN = "Clear farm soil first", CN = "请先清理农田土壤"}),
-    TILES_2 = en_zh({EN = "2 Tiles", CN = "2 格"}),
-    TILES_4 = en_zh({EN = "4 Tiles", CN = "4 格"}),
-}
+-- 获取服务器语言并加载对应 PO 文件
+local desiredlang = LOC.GetLocaleCode()
+if desiredlang and languages[desiredlang] then
+    PLENV.LoadPOFile("scripts/languages/masterfarmer_" .. languages[desiredlang] .. ".po", desiredlang)
+    TranslateStringTable(STRINGS)
+end
