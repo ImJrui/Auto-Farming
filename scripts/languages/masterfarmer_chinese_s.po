@@ -112,13 +112,13 @@ msgstr "种植此组合？"
 
 #. STRINGS.AUTOPLANT.SEEDS_INSUFFICIENT
 msgctxt "STRINGS.AUTOPLANT.SEEDS_INSUFFICIENT"
-msgid "Seeds are insufficient"
-msgstr "种子不足"
+msgid "Not enough seeds for this combo"
+msgstr "这个组合的种子不足"
 
 #. STRINGS.AUTOPLANT.CLEAR_FARM_SOIL
 msgctxt "STRINGS.AUTOPLANT.CLEAR_FARM_SOIL"
-msgid "Clear farm soil first"
-msgstr "请先清理农田土壤"
+msgid "Clear at least two farm plots first"
+msgstr "请先清理至少两块农田"
 
 #. STRINGS.AUTOPLANT.TILES_2
 msgctxt "STRINGS.AUTOPLANT.TILES_2"

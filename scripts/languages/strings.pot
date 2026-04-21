@@ -108,12 +108,12 @@ msgstr ""
 
 #. STRINGS.AUTOPLANT.SEEDS_INSUFFICIENT
 msgctxt "STRINGS.AUTOPLANT.SEEDS_INSUFFICIENT"
-msgid "Seeds are insufficient"
+msgid "Not enough seeds for this combo"
 msgstr ""
 
 #. STRINGS.AUTOPLANT.CLEAR_FARM_SOIL
 msgctxt "STRINGS.AUTOPLANT.CLEAR_FARM_SOIL"
-msgid "Clear farm soil first"
+msgid "Clear at least two farm plots first"
 msgstr ""
 
 #. STRINGS.AUTOPLANT.TILES_2
