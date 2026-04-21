@@ -39,11 +39,45 @@ local function GetSeasonName(season)
     return season_display
 end
 
-local ComboScreen = Class(Screen, function(self, owner, balanced_combos)
+local function ComboContainsAllPlants(combo, plants)
+    if not plants or #plants == 0 then
+        return true
+    end
+
+    local combo_plants = {}
+    for _, plant in ipairs(combo.plants or {}) do
+        combo_plants[plant] = true
+    end
+
+    for _, plant in ipairs(plants) do
+        if not combo_plants[plant] then
+            return false
+        end
+    end
+
+    return true
+end
+
+local function GetPlantDisplayName(plant)
+    return STRINGS.NAMES[string.upper(plant)] or plant
+end
+
+local function GetFilteredPlantsText(plants)
+    local names = {}
+
+    for _, plant in ipairs(plants or {}) do
+        table.insert(names, GetPlantDisplayName(plant))
+    end
+
+    return table.concat(names, ",")
+end
+
+local ComboScreen = Class(Screen, function(self, owner, balanced_combos, filtered_plants)
     Screen._ctor(self, "ComboScreen")
 
     self.owner = owner
-    self.balanced_combos = balanced_combos or {}
+    self.all_combos = balanced_combos or {}
+    self.filtered_plants = filtered_plants or {}
 
     self.root = self:AddChild(TEMPLATES.ScreenRoot("root"))
 
@@ -51,6 +85,37 @@ local ComboScreen = Class(Screen, function(self, owner, balanced_combos)
 
     self.title = self.panel:AddChild(Text(BODYTEXTFONT, 40, STRINGS.AUTOPLANT.COMBO_LIST))
     self.title:SetPosition(0, 270)
+
+    self.filter = self.panel:AddChild(
+        TEMPLATES.StandardButton(
+            function()
+                self.owner.components.autoplant:OpenFilterScreen()
+            end,
+            "Filter",
+            {75, 40}
+        )
+    )
+    self.filter:SetPosition(-178, 252)
+
+    local crafting_atlas = resolvefilepath(CRAFTING_ATLAS)
+    self.clear_filter = self.panel:AddChild(
+        TEMPLATES.StandardButton(
+            function()
+                if self.owner.components.autoplant then
+                    self.owner.components.autoplant:ClearFilter()
+                end
+            end,
+            "",
+            {40, 40}
+        )
+    )
+    self.clear_filter:SetPosition(-120, 252)
+    self.clear_filter.icon = self.clear_filter:AddChild(Image(crafting_atlas, "pinslot_unpin_button.tex"))
+    self.clear_filter.icon:SetScale(0.3)
+    self.clear_filter.icon:SetClickable(false)
+    self.clear_filter:SetHoverText("clear")
+
+    self:UpdateFilterButtonText()
 
     -- Continue button → resume autoplant if has unfinished targets, otherwise enable autofarm
     self.continue = self.panel:AddChild(
@@ -69,7 +134,6 @@ local ComboScreen = Class(Screen, function(self, owner, balanced_combos)
     )
     self.continue:SetPosition(-100, -270)
 
-    -- Cancel button
     self.cancel = self.panel:AddChild(
         TEMPLATES.StandardButton(
             function() self.owner.HUD:CloseComboScreen() end,
@@ -83,18 +147,6 @@ local ComboScreen = Class(Screen, function(self, owner, balanced_combos)
 end)
 
 function ComboScreen:BuildList()
-    local current_season = TheWorld.state.season
-    table.sort(self.balanced_combos, function(a, b)
-        local value_a = a.seasons[current_season] and a.priority or a.priority / 2
-        local value_b = b.seasons[current_season] and b.priority or b.priority / 2
-        return value_a > value_b
-    end)
-
-    local items = {}
-    for i, combo in ipairs(self.balanced_combos) do
-        table.insert(items, {combo = combo})
-    end
-
     local function ItemCtor(context, index)
         local w = Widget("item" .. index)
         w.bg = w:AddChild(TEMPLATES.ListItemBackground(500, 90, function() end))
@@ -119,7 +171,9 @@ function ComboScreen:BuildList()
         end
 
         widget:Show()
+
         local combo = data.combo
+        local current_season = TheWorld.state.season
 
         widget.icons:KillAllChildren()
 
@@ -149,9 +203,9 @@ function ComboScreen:BuildList()
 
         local world_type = GetWorldType()
         local sort_table = (world_type == WORLDTYPE.FOREST or world_type == WORLDTYPE.CAVE) and season_sort.DST
-                    or (world_type == WORLDTYPE.SHIPWRECKED or world_type == WORLDTYPE.VOLCANOWORLD) and season_sort.SW
-                    or (world_type == WORLDTYPE.PORKLAND) and season_sort.HAM
-                    or season_sort.DST
+            or (world_type == WORLDTYPE.SHIPWRECKED or world_type == WORLDTYPE.VOLCANOWORLD) and season_sort.SW
+            or (world_type == WORLDTYPE.PORKLAND) and season_sort.HAM
+            or season_sort.DST
 
         local seasons = {}
         for season, bool in pairs(combo.seasons or {}) do
@@ -176,7 +230,7 @@ function ComboScreen:BuildList()
     end
 
     self.scroll = self.panel:AddChild(
-        TEMPLATES.ScrollingGrid(items, {
+        TEMPLATES.ScrollingGrid({}, {
             context = {},
             widget_width = 500,
             widget_height = 90,
@@ -186,6 +240,65 @@ function ComboScreen:BuildList()
             apply_fn = Apply,
         })
     )
+
+    self:RefreshList()
+end
+
+function ComboScreen:SetFilterPlants(filtered_plants)
+    self.filtered_plants = filtered_plants or {}
+    self:UpdateFilterButtonText()
+    self:RefreshList()
+end
+
+function ComboScreen:UpdateFilterButtonText()
+    local has_filter = #(self.filtered_plants or {}) > 0
+
+    if self.filter then
+        if has_filter then
+            self.filter:SetText("Filtered")
+            self.filter:SetHoverText("Filtered:" .. GetFilteredPlantsText(self.filtered_plants), {offset_y = 45})
+        else
+            self.filter:SetText("Filter")
+            self.filter:ClearHoverText()
+        end
+    end
+
+    if self.clear_filter then
+        if has_filter then
+            self.clear_filter:Show()
+        else
+            self.clear_filter:Hide()
+        end
+    end
+end
+
+function ComboScreen:RefreshList()
+    if not self.scroll then
+        return
+    end
+
+    local current_season = TheWorld.state.season
+    local filtered_combos = {}
+
+    for _, combo in ipairs(self.all_combos or {}) do
+        if ComboContainsAllPlants(combo, self.filtered_plants) then
+            table.insert(filtered_combos, combo)
+        end
+    end
+
+    table.sort(filtered_combos, function(a, b)
+        local value_a = a.seasons[current_season] and a.priority or a.priority / 2
+        local value_b = b.seasons[current_season] and b.priority or b.priority / 2
+        return value_a > value_b
+    end)
+
+    local items = {}
+    for _, combo in ipairs(filtered_combos) do
+        table.insert(items, {combo = combo})
+    end
+
+    self.scroll:SetItemsData(items)
+    self.scroll:ResetScroll()
 end
 
 function ComboScreen:OnControl(control, down)
@@ -193,11 +306,9 @@ function ComboScreen:OnControl(control, down)
         return true
     end
 
-    if not down then
-        if control == CONTROL_CANCEL then
-            self.owner.HUD:CloseComboScreen()
-            return true
-        end
+    if not down and control == CONTROL_CANCEL then
+        self.owner.HUD:CloseComboScreen()
+        return true
     end
 
     return false

@@ -42,6 +42,14 @@ local seasons_type = {
     ham = {"temperate", "humid", "lush"},
 }
 
+local function GetWorldSeasons()
+    local world_type = GetWorldType()
+    return (world_type == WORLDTYPE.FOREST or world_type == WORLDTYPE.CAVE) and seasons_type.dst
+        or (world_type == WORLDTYPE.SHIPWRECKED or world_type == WORLDTYPE.VOLCANOWORLD) and seasons_type.sw
+        or (world_type == WORLDTYPE.PORKLAND) and seasons_type.ham
+        or seasons_type.dst
+end
+
 local function IsFarmHoe(item)
     return item.prefab == "farm_hoe" or item.prefab == "golden_farm_hoe" or item.prefab == "shovel_lunarplant"
 end
@@ -97,6 +105,9 @@ local AutoPlant = Class(function(self, inst)
     self.height = 2.5
     self.show_status = true
     self.stuck_attempts = MAX_STUCK_ATTEMPTS
+    self.seasons = GetWorldSeasons()
+    self.filtered_plants = {}
+    self.filter_season_index = nil
 end)
 
 function AutoPlant:OnUpdate()
@@ -468,16 +479,12 @@ function AutoPlant:ResetPlantingPlan()
 end
 
 function AutoPlant:OpenComboScreen()
-    local world_type = GetWorldType()
-    local seasons_table = (world_type == WORLDTYPE.FOREST or world_type == WORLDTYPE.CAVE) and seasons_type.dst
-                or (world_type == WORLDTYPE.SHIPWRECKED or world_type == WORLDTYPE.VOLCANOWORLD) and seasons_type.sw
-                or (world_type == WORLDTYPE.PORKLAND) and seasons_type.ham
-                or seasons_type.dst
+    self.seasons = GetWorldSeasons()
 
     local combos = {}
     for k, v in pairs(plant_planner.BALANCED_COMBOS) do
         if plant_planner.LAYOUT_TEMPLATES[v.proportion] then
-            for _, season in ipairs(seasons_table) do
+            for _, season in ipairs(self.seasons) do
                 if v.seasons[season] then
                     table.insert(combos, v)
                     break
@@ -487,7 +494,40 @@ function AutoPlant:OpenComboScreen()
     end
 
     if self.inst and self.inst.HUD then
-        self.inst.HUD:OpenComboScreen(combos)
+        self.inst.HUD:OpenComboScreen(combos, self.filtered_plants)
+    end
+end
+
+function AutoPlant:RefreshComboScreenFilter()
+    if self.inst and self.inst.HUD and self.inst.HUD.comboscreen then
+        self.inst.HUD.comboscreen:SetFilterPlants(self.filtered_plants)
+    end
+end
+
+function AutoPlant:ApplyFilter(plants, season_index)
+    self.filtered_plants = plants or {}
+    self.filter_season_index = #self.filtered_plants > 0 and season_index or nil
+    self:RefreshComboScreenFilter()
+end
+
+function AutoPlant:ClearFilter()
+    self.filtered_plants = {}
+    self.filter_season_index = nil
+    self:RefreshComboScreenFilter()
+end
+
+function AutoPlant:OpenFilterScreen()
+    self.seasons = GetWorldSeasons()
+
+    local data = {}
+    for i = 1, #self.seasons do
+        local season = self.seasons[i]
+        data[season] = plant_planner.IN_SEASON_PLANTS[season] or {}
+    end
+
+    if self.inst and self.inst.HUD then
+        local filter_season_index = #self.filtered_plants > 0 and self.filter_season_index or nil
+        self.inst.HUD:OpenFilterScreen(data, self.filtered_plants, filter_season_index)
     end
 end
 

@@ -535,6 +535,19 @@ local function GeneratePositionsPlan(tile, positions)
     return result
 end
 
+local IN_SEASON_PLANTS = {}
+
+for plant, def in pairs(PLANT_DEFS) do
+    if plant ~= "randomseed" and def.good_seasons then
+        for season, v in pairs(def.good_seasons) do
+            if v then
+                IN_SEASON_PLANTS[season] = IN_SEASON_PLANTS[season] or {}
+                table.insert(IN_SEASON_PLANTS[season], plant)
+            end
+        end
+    end
+end
+
 return {
     SNAP_3x3 = SNAP_3x3,
     SNAP_HEXAGON = SNAP_HEXAGON,
@@ -542,6 +555,7 @@ return {
     PLANT_NUTRIENTS = PLANT_NUTRIENTS,
     BALANCED_COMBOS = BALANCED_COMBOS,
     LAYOUT_TEMPLATES = LAYOUT_TEMPLATES,
+    IN_SEASON_PLANTS = IN_SEASON_PLANTS,
     GetLayouts = GetLayouts,
     GeneratePositionsPlan = GeneratePositionsPlan,
 }
