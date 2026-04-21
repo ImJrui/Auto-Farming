@@ -91,7 +91,7 @@ local ComboScreen = Class(Screen, function(self, owner, balanced_combos, filtere
             function()
                 self.owner.components.autoplant:OpenFilterScreen()
             end,
-            "Filter",
+            STRINGS.AUTOPLANT.FILTER,
             {75, 40}
         )
     )
@@ -113,7 +113,7 @@ local ComboScreen = Class(Screen, function(self, owner, balanced_combos, filtere
     self.clear_filter.icon = self.clear_filter:AddChild(Image(crafting_atlas, "pinslot_unpin_button.tex"))
     self.clear_filter.icon:SetScale(0.3)
     self.clear_filter.icon:SetClickable(false)
-    self.clear_filter:SetHoverText("clear")
+    self.clear_filter:SetHoverText(STRINGS.AUTOPLANT.CLEAR_FILTER)
 
     self:UpdateFilterButtonText()
 
@@ -255,10 +255,10 @@ function ComboScreen:UpdateFilterButtonText()
 
     if self.filter then
         if has_filter then
-            self.filter:SetText("Filtered")
-            self.filter:SetHoverText("Filtered:" .. GetFilteredPlantsText(self.filtered_plants), {offset_y = 45})
+            self.filter:SetText(STRINGS.AUTOPLANT.FILTERED)
+            self.filter:SetHoverText(STRINGS.AUTOPLANT.FILTERED_PREFIX .. GetFilteredPlantsText(self.filtered_plants), {offset_y = 45})
         else
-            self.filter:SetText("Filter")
+            self.filter:SetText(STRINGS.AUTOPLANT.FILTER)
             self.filter:ClearHoverText()
         end
     end

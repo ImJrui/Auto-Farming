@@ -46,6 +46,36 @@ msgctxt "STRINGS.AUTOPLANT.COMBO_LIST"
 msgid "Combo List"
 msgstr ""
 
+#. STRINGS.AUTOPLANT.FILTER
+msgctxt "STRINGS.AUTOPLANT.FILTER"
+msgid "Filter"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.FILTERED
+msgctxt "STRINGS.AUTOPLANT.FILTERED"
+msgid "Filtered"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.FILTERED_PREFIX
+msgctxt "STRINGS.AUTOPLANT.FILTERED_PREFIX"
+msgid "Filtered:"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.CLEAR_FILTER
+msgctxt "STRINGS.AUTOPLANT.CLEAR_FILTER"
+msgid "Clear filter"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.CROP_FILTER
+msgctxt "STRINGS.AUTOPLANT.CROP_FILTER"
+msgid "Crop Filter"
+msgstr ""
+
+#. STRINGS.AUTOPLANT.CONFIRM
+msgctxt "STRINGS.AUTOPLANT.CONFIRM"
+msgid "Confirm"
+msgstr ""
+
 #. STRINGS.AUTOPLANT.CONTINUE
 msgctxt "STRINGS.AUTOPLANT.CONTINUE"
 msgid "Continue"
