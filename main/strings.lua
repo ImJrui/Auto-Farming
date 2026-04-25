@@ -29,7 +29,7 @@ local function import(module_name)
 end
 
 -- 加载字符串表
-ToolUtil.MergeTable(STRINGS, import("common"), true)
+MergeTable(STRINGS, import("common"), true)
 
 -- 获取服务器语言并加载对应 PO 文件
 local desiredlang = LOC.GetLocaleCode()

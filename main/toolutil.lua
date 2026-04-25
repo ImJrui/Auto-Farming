@@ -3,11 +3,8 @@ local GetModConfigData = GetModConfigData
 local PLENV = env
 GLOBAL.setfenv(1, GLOBAL)
 
-ToolUtil = {}
-PLENV.ToolUtil = ToolUtil
-
 ---@param t table
-function ToolUtil.IsArray(t)
+function IsArray(t)
     if type(t) ~= "table" or not next(t) then
         return false
     end
@@ -25,7 +22,7 @@ end
 ---@param target table
 ---@param add_table table
 ---@param override boolean
-function ToolUtil.MergeTable(target, add_table, override)
+function MergeTable(target, add_table, override)
     target = target or {}
 
     for k, v in pairs(add_table) do
@@ -40,9 +37,9 @@ function ToolUtil.MergeTable(target, add_table, override)
                 end
             end
 
-            ToolUtil.MergeTable(target[k], v, override)
+            MergeTable(target[k], v, override)
         else
-            if ToolUtil.IsArray and not override then
+            if IsArray and not override then
                 table.insert(target, v)
             elseif not target[k] or override then
                 target[k] = v
