@@ -4,15 +4,15 @@ local Image = require("widgets/image")
 local Text = require("widgets/text")
 
 local ComboConfirmScreen = Class(PopupDialogScreen, function(self, owner, combo, tiles, seeds_amount)
-    local title = STRINGS.AUTOPLANT.PLANT_COMBO
+    local title = STRINGS.MASTERFARMER.AUTOPLANT.PLANT_COMBO
     local text = ""
 
     if seeds_amount < 2 then
-        text = text .. STRINGS.AUTOPLANT.SEEDS_INSUFFICIENT .. "\n"
+        text = text .. STRINGS.MASTERFARMER.AUTOPLANT.SEEDS_INSUFFICIENT .. "\n"
     end
 
     if #tiles < 2 then
-        text = text .. STRINGS.AUTOPLANT.CLEAR_FARM_SOIL .. "\n"
+        text = text .. STRINGS.MASTERFARMER.AUTOPLANT.CLEAR_FARM_SOIL .. "\n"
     end
 
     if text == "" then
@@ -23,7 +23,7 @@ local ComboConfirmScreen = Class(PopupDialogScreen, function(self, owner, combo,
 
     if #tiles >= 2 and seeds_amount >= 2 then
         table.insert(buttons, {
-            text = STRINGS.AUTOPLANT.TILES_2,
+            text = STRINGS.MASTERFARMER.AUTOPLANT.TILES_2,
             cb = function()
                 owner.components.autoplant:ResetPlantingPlan()
                 owner.components.autoplant:GeneratePlantingPlan(combo, tiles, 2)
@@ -36,7 +36,7 @@ local ComboConfirmScreen = Class(PopupDialogScreen, function(self, owner, combo,
 
     if #tiles >= 4 and seeds_amount >= 4 then
         table.insert(buttons, {
-            text = STRINGS.AUTOPLANT.TILES_4,
+            text = STRINGS.MASTERFARMER.AUTOPLANT.TILES_4,
             cb = function()
                 owner.components.autoplant:ResetPlantingPlan()
                 owner.components.autoplant:GeneratePlantingPlan(combo, tiles, 4)
@@ -48,7 +48,7 @@ local ComboConfirmScreen = Class(PopupDialogScreen, function(self, owner, combo,
     end
 
     table.insert(buttons, {
-        text = STRINGS.AUTOPLANT.CANCEL,
+        text = STRINGS.MASTERFARMER.AUTOPLANT.CANCEL,
         cb = function()
             TheFrontEnd:PopScreen()
         end,

@@ -575,7 +575,7 @@ function AutoPlant:Enable()
     if self.inst.HUD and self.show_status then
         local tex = "golden_farm_hoe.tex"
         local atlas = resolvefilepath(GetInventoryItemAtlas(tex))
-        self.inst.HUD:ShowStatusDisplayer(atlas, tex, STRINGS.AUTOPLANT.PLANTING, self.height)
+        self.inst.HUD:ShowStatusDisplayer(atlas, tex, STRINGS.MASTERFARMER.AUTOPLANT.PLANTING, self.height)
     end
 end
 

@@ -34,6 +34,17 @@ MergeTable(STRINGS, import("common"), true)
 -- 获取服务器语言并加载对应 PO 文件
 local desiredlang = LOC.GetLocaleCode()
 if desiredlang and languages[desiredlang] then
-    PLENV.LoadPOFile("scripts/languages/masterfarmer_" .. languages[desiredlang] .. ".po", desiredlang)
+    local defaultlang = LanguageTranslator.defaultlang
+    local temp_lang = defaultlang and (defaultlang .. "_masterfarmer_temp")
+    if temp_lang then
+        PLENV.LoadPOFile("scripts/languages/masterfarmer_" .. languages[desiredlang] .. ".po", temp_lang)
+        local temp_strings = LanguageTranslator.languages[temp_lang]
+        if temp_strings then
+            LanguageTranslator.languages[defaultlang] = LanguageTranslator.languages[defaultlang] or {}
+            MergeTable(LanguageTranslator.languages[defaultlang], temp_strings, true)
+            LanguageTranslator.languages[temp_lang] = nil
+        end
+        LanguageTranslator.defaultlang = defaultlang
+    end
     TranslateStringTable(STRINGS)
 end

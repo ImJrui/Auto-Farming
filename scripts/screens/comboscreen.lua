@@ -83,7 +83,7 @@ local ComboScreen = Class(Screen, function(self, owner, balanced_combos, filtere
 
     self.panel = self.root:AddChild(TEMPLATES.RectangleWindow(520, 620))
 
-    self.title = self.panel:AddChild(Text(BODYTEXTFONT, 40, STRINGS.AUTOPLANT.COMBO_LIST))
+    self.title = self.panel:AddChild(Text(BODYTEXTFONT, 40, STRINGS.MASTERFARMER.AUTOPLANT.COMBO_LIST))
     self.title:SetPosition(0, 270)
 
     self.filter = self.panel:AddChild(
@@ -91,7 +91,7 @@ local ComboScreen = Class(Screen, function(self, owner, balanced_combos, filtere
             function()
                 self.owner.components.autoplant:OpenFilterScreen()
             end,
-            STRINGS.AUTOPLANT.FILTER,
+            STRINGS.MASTERFARMER.AUTOPLANT.FILTER,
             {75, 40}
         )
     )
@@ -113,7 +113,7 @@ local ComboScreen = Class(Screen, function(self, owner, balanced_combos, filtere
     self.clear_filter.icon = self.clear_filter:AddChild(Image(crafting_atlas, "pinslot_unpin_button.tex"))
     self.clear_filter.icon:SetScale(0.3)
     self.clear_filter.icon:SetClickable(false)
-    self.clear_filter:SetHoverText(STRINGS.AUTOPLANT.CLEAR_FILTER)
+    self.clear_filter:SetHoverText(STRINGS.MASTERFARMER.AUTOPLANT.CLEAR_FILTER)
 
     self:UpdateFilterButtonText()
 
@@ -128,7 +128,7 @@ local ComboScreen = Class(Screen, function(self, owner, balanced_combos, filtere
                 end
                 self.owner.HUD:CloseComboScreen()
             end,
-            STRINGS.AUTOPLANT.CONTINUE,
+            STRINGS.MASTERFARMER.AUTOPLANT.CONTINUE,
             {150, 50}
         )
     )
@@ -137,7 +137,7 @@ local ComboScreen = Class(Screen, function(self, owner, balanced_combos, filtere
     self.cancel = self.panel:AddChild(
         TEMPLATES.StandardButton(
             function() self.owner.HUD:CloseComboScreen() end,
-            STRINGS.AUTOPLANT.CANCEL,
+            STRINGS.MASTERFARMER.AUTOPLANT.CANCEL,
             {150, 50}
         )
     )
@@ -194,10 +194,10 @@ function ComboScreen:BuildList()
         end
 
         if combo.seasons and combo.seasons[current_season] then
-            widget.name:SetString(STRINGS.AUTOPLANT.PRIORITY .. tostring(combo.priority or 0))
+            widget.name:SetString(STRINGS.MASTERFARMER.AUTOPLANT.PRIORITY .. tostring(combo.priority or 0))
             widget.name:SetColour(1, 1, 1, 1)
         else
-            widget.name:SetString(STRINGS.AUTOPLANT.NOT_IN_SEASON)
+            widget.name:SetString(STRINGS.MASTERFARMER.AUTOPLANT.NOT_IN_SEASON)
             widget.name:SetColour(1, 0, 0, 1)
         end
 
@@ -222,7 +222,7 @@ function ComboScreen:BuildList()
         for _, season in ipairs(seasons) do
             table.insert(seasons_name, GetSeasonName(season))
         end
-        widget.season:SetString(#seasons_name > 0 and table.concat(seasons_name, ", ") or STRINGS.AUTOPLANT.UNKNOWN)
+        widget.season:SetString(#seasons_name > 0 and table.concat(seasons_name, ", ") or STRINGS.MASTERFARMER.AUTOPLANT.UNKNOWN)
 
         widget.bg:SetOnClick(function()
             self.owner.components.autoplant:OnSelectCombo(combo)
@@ -255,10 +255,10 @@ function ComboScreen:UpdateFilterButtonText()
 
     if self.filter then
         if has_filter then
-            self.filter:SetText(STRINGS.AUTOPLANT.FILTERED)
-            self.filter:SetHoverText(STRINGS.AUTOPLANT.FILTERED_PREFIX .. GetFilteredPlantsText(self.filtered_plants), {offset_y = 45})
+            self.filter:SetText(STRINGS.MASTERFARMER.AUTOPLANT.FILTERED)
+            self.filter:SetHoverText(STRINGS.MASTERFARMER.AUTOPLANT.FILTERED_PREFIX .. GetFilteredPlantsText(self.filtered_plants), {offset_y = 45})
         else
-            self.filter:SetText(STRINGS.AUTOPLANT.FILTER)
+            self.filter:SetText(STRINGS.MASTERFARMER.AUTOPLANT.FILTER)
             self.filter:ClearHoverText()
         end
     end

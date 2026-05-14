@@ -14,7 +14,7 @@ local StatusDisplayer = Class(Widget, function(self, owner)
     self.icon:SetScale(0.5)
     self.icon:SetPosition(-50, 25)
 
-    self.text = self.root:AddChild(Text(NUMBERFONT, 22, STRINGS.AUTOFARM.FARMING))
+    self.text = self.root:AddChild(Text(NUMBERFONT, 22, STRINGS.MASTERFARMER.AUTOFARM.FARMING))
     self.text:SetPosition(20, 25)
 
     self:Hide()

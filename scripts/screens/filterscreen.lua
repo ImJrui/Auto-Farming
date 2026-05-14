@@ -96,7 +96,7 @@ local FilterScreen = Class(Screen, function(self, owner, data, filtered_plants, 
     self.root = self:AddChild(TEMPLATES.ScreenRoot("root"))
     self.panel = self.root:AddChild(TEMPLATES.RectangleWindow(520, 500))
 
-    self.title = self.panel:AddChild(Text(BODYTEXTFONT, 40, STRINGS.AUTOPLANT.CROP_FILTER))
+    self.title = self.panel:AddChild(Text(BODYTEXTFONT, 40, STRINGS.MASTERFARMER.AUTOPLANT.CROP_FILTER))
     self.title:SetPosition(0, 200)
 
     self.season_text = self.panel:AddChild(Text(BODYTEXTFONT, 30))
@@ -116,7 +116,7 @@ local FilterScreen = Class(Screen, function(self, owner, data, filtered_plants, 
     self.confirm = self.panel:AddChild(
         TEMPLATES.StandardButton(function()
             self:OnConfirm()
-        end, STRINGS.AUTOPLANT.CONFIRM, {150, 50})
+        end, STRINGS.MASTERFARMER.AUTOPLANT.CONFIRM, {150, 50})
     )
     self.confirm:SetPosition(-100, -200)
 
@@ -126,7 +126,7 @@ local FilterScreen = Class(Screen, function(self, owner, data, filtered_plants, 
                 self.owner.components.autoplant:ClearFilter()
             end
             self.owner.HUD:CloseFilterScreen()
-        end, STRINGS.AUTOPLANT.CANCEL, {150, 50})
+        end, STRINGS.MASTERFARMER.AUTOPLANT.CANCEL, {150, 50})
     )
     self.cancel:SetPosition(100, -200)
 

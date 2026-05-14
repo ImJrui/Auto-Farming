@@ -589,12 +589,12 @@ function AutoFarm:Enable()
     if self.inst.HUD and self.show_status then
         local tex = "nutrientsgoggleshat.tex"
         local atlas = resolvefilepath(GetInventoryItemAtlas(tex))
-        self.inst.HUD:ShowStatusDisplayer(atlas, tex, STRINGS.AUTOFARM.FARMING, self.height or 2.5)
+        self.inst.HUD:ShowStatusDisplayer(atlas, tex, STRINGS.MASTERFARMER.AUTOFARM.FARMING, self.height or 2.5)
     else
         local current = self:IsEnabled()
-        local text = current and STRINGS.AUTOFARM.ENABLED or STRINGS.AUTOFARM.DISABLED
+        local text = GetMasterFarmerModeText(current)
 
-        self.inst.components.talker:Say(STRINGS.AUTOFARM.NAME.. ": " .. text)
+        self.inst.components.talker:Say(GetMasterFarmerStatusText("AUTOFARM", text))
     end
 end
 
@@ -608,9 +608,9 @@ function AutoFarm:Disable()
         self.inst.HUD:HideStatusDisplayer()
     else
         local current = self:IsEnabled()
-        local text = current and STRINGS.AUTOFARM.ENABLED or STRINGS.AUTOFARM.DISABLED
+        local text = GetMasterFarmerModeText(current)
 
-        self.inst.components.talker:Say(STRINGS.AUTOFARM.NAME.. ": " .. text)
+        self.inst.components.talker:Say(GetMasterFarmerStatusText("AUTOFARM", text))
     end
 end
 

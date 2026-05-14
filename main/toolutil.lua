@@ -33,19 +33,61 @@ function MergeTable(target, add_table, override)
                 if override then
                     target[k] = {}
                 else
-                    error("Can not override" .. k .. " to a table")
+                    error("Can not override " .. tostring(k) .. " to a table")
                 end
             end
 
             MergeTable(target[k], v, override)
         else
-            if IsArray and not override then
+            if IsArray(target) and not override then
                 table.insert(target, v)
             elseif not target[k] or override then
                 target[k] = v
             end
         end
     end
+
+    return target
+end
+
+function GetMasterFarmerString(...)
+    local value = STRINGS and STRINGS.MASTERFARMER
+
+    for i = 1, select("#", ...) do
+        if type(value) ~= "table" then
+            return nil
+        end
+        value = value[select(i, ...)]
+    end
+
+    return type(value) == "string" and value or nil
+end
+
+function GetMasterFarmerComponentName(component_key)
+    local component = STRINGS
+        and STRINGS.MASTERFARMER
+        and STRINGS.MASTERFARMER.COMPONENTS
+        and STRINGS.MASTERFARMER.COMPONENTS[component_key]
+
+    if type(component) == "table" then
+        return component.NAME or tostring(component_key)
+    end
+
+    return tostring(component_key)
+end
+
+function GetMasterFarmerModeText(mode)
+    if mode == true then
+        return GetMasterFarmerString("COMMON", "ENABLED") or "Enabled"
+    end
+
+    return GetMasterFarmerString("COMMON", "DISABLED") or "Disabled"
+end
+
+function GetMasterFarmerStatusText(component_key, status_text)
+    local fmt = GetMasterFarmerString("COMMON", "STATUS_FORMAT") or "%s: %s"
+    local ok, result = pcall(string.format, fmt, GetMasterFarmerComponentName(component_key), tostring(status_text))
+    return ok and result or (GetMasterFarmerComponentName(component_key) .. ": " .. tostring(status_text))
 end
 
 function DebugPrint(...)
