@@ -120,6 +120,10 @@ local function OnHotKeyLongPress()
 end
 
 local function OnHotKeyDown()
+    if TheInput:IsKeyDown(KEY_CTRL) or TheInput:IsKeyDown(KEY_SHIFT) or TheInput:IsKeyDown(KEY_ALT) then
+        return
+    end
+
     if hotkey_is_down then
         return
     end
